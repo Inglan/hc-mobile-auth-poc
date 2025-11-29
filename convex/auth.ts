@@ -10,6 +10,7 @@ import { genericOAuth } from "better-auth/plugins";
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
 export const authComponent = createClient<DataModel>(components.betterAuth);
+const siteUrl = process.env.SITE_URL!;
 
 export const createAuth = (
   ctx: GenericCtx<DataModel>,
@@ -21,6 +22,8 @@ export const createAuth = (
     logger: {
       disabled: optionsOnly,
     },
+    baseURL: siteUrl,
+
     trustedOrigins: ["*"], // high security /s (DONT USE IN PROD)
     database: authComponent.adapter(ctx),
     // Configure simple, non-verified email/password to get started
