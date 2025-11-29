@@ -24,7 +24,8 @@ export const createAuth = (
     },
     baseURL: siteUrl,
 
-    trustedOrigins: ["*"], // high security /s (DONT USE IN PROD)
+    // My local ip because wildcard not working :)
+    trustedOrigins: ["exp://192.168.178.68:8081"],
     database: authComponent.adapter(ctx),
     // Configure simple, non-verified email/password to get started
     emailAndPassword: {
