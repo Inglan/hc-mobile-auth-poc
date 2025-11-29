@@ -5,6 +5,7 @@ import { expo } from "@better-auth/expo";
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
+import { genericOAuth } from "better-auth/plugins";
 
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
@@ -31,6 +32,41 @@ export const createAuth = (
       // The Expo and Convex plugins are required
       expo(),
       convex(),
+      genericOAuth({
+        config: [
+          {
+            providerId: "hack-club",
+            clientId: process.env.HACK_CLUB_CLIENT_ID!,
+            clientSecret: process.env.HACK_CLUB_CLIENT_SECRET!,
+            // discoveryUrl: "", // HC Account doesn't support discovery
+
+            // URLs for auth
+            authorizationUrl: "https://account.hackclub.com/oauth/authorize",
+            tokenUrl: "https://account.hackclub.com/oauth/token",
+
+            scopes: ["email", "name", "slack_id"],
+
+            // Custom get user info function
+            getUserInfo: async (tokens) => {
+              const userInfo = await fetch(
+                "https://account.hackclub.com/api/v1/me",
+                {
+                  headers: {
+                    Authorization: `Bearer ${tokens.accessToken}`,
+                  },
+                },
+              ).then((res) => res.json());
+
+              return {
+                emailVerified: true,
+                id: userInfo.identity.id,
+                name: `${userInfo.identity.first_name} ${userInfo.identity.last_name}`,
+                email: userInfo.identity.primary_email,
+              };
+            },
+          },
+        ],
+      }),
     ],
   });
 };
